@@ -1,8 +1,8 @@
-## 
+## Info: ##
 Name: Cody Dalton
-Class: WDV322-O(Programming for Web Applications)
-##
 
-### 
-to start: npm start 
-###
+Class: WDV322-O(Programming for Web Applications)
+
+## Start: ##
+
+npm start 
