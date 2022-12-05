@@ -1,11 +1,10 @@
 const mongoose = require('mongoose');
 
 const userSchema = mongoose.Schema({
-    _id: mongoose.Schema.Types.ObjectId,
-    firstname: {
+    firstName: {
         type: String,
     },
-    lastname: {
+    lastName: {
         type: String,
     },
     address: {
