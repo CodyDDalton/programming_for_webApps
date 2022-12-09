@@ -4,6 +4,7 @@ const User = require('../model/user');
 const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
 const { findUser, saveUser } = require('../db/db');
+const jwt = require('jsonwebtoken');
 
 routes.post('/signup', (req, res) => {
 findUser(req.body.email)
@@ -61,17 +62,17 @@ routes.post('/login', (req, res) => {
                 if(result.length >! 0){
                     res.status(500).json({
                         message:'We could not find an account belonging to email: '+req.body.email,
-                    })
-                    
+                    });
                 }
                 else {
                     bcrypt.compare(req.body.password, result[0].password, (err, result)=>{
                         if(err){
                             return res.status(501).json({
                                 message:err.message
-                            })
+                            });
                         }
                         if(result){
+                            jwt.sign({email:req.body.email, id:req.body.id}, process.env.jwt_key);
                             res.status(200).json({
                                 message: "Authorization Successful",
                                 result: result,
@@ -96,13 +97,27 @@ routes.post('/login', (req, res) => {
 });
 
 routes.get('/profile', (req, res, next) => {
-    User.find()
-        .exec()
-        .then(result => {
-            res.status(200).json({
-                result:result
+
+    try{
+        const token = req.headers.authorization.split(' ')[1];
+        const decoded = jwt.verify(token, process.env.jwt_key);
+        User.find()
+            .exec()
+            .then(result => {
+                res.status(200).json({
+                    message: 'Verified',
+                    decoded: decoded, 
+                    result:result
+            })
         })
-        })
+
+    }
+    catch(error){
+        res.status(401).json({
+            message:'Authorization failed',
+        });
+    }
+    
 });
 
 module.exports = routes;
