@@ -5,6 +5,8 @@ const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
 const { findUser, saveUser } = require('../db/db');
 const jwt = require('jsonwebtoken');
+const checkAuth = require('../auth/checkAuth');
+require('dotenv').config();
 
 routes.post('/signup', (req, res) => {
 findUser(req.body.email)
@@ -65,6 +67,10 @@ routes.post('/login', (req, res) => {
                     });
                 }
                 else {
+                    const firstName = result[0].firstName;
+                    const lastName = result[0].lastName;
+                    const email = result[0].email;
+                    const password = result[0].password;
                     bcrypt.compare(req.body.password, result[0].password, (err, result)=>{
                         if(err){
                             return res.status(501).json({
@@ -73,12 +79,15 @@ routes.post('/login', (req, res) => {
                         }
                         if(result){
                             const token = jwt.sign({ 
-                                email:result.email,
-                                password:result.password,
-                            })
+                                email:email,
+                                password:password,
+                            }, process.env.jwt)
                             res.status(200).json({
                                 message: "Authorization Successful",
                                 result: result,
+                                firstName: firstName,
+                                lastName: lastName,
+                                token:token
                             });
                         }
                         else {
@@ -99,38 +108,12 @@ routes.post('/login', (req, res) => {
             })
 });
 
-routes.get('/profile', (req, res, next) => {
+routes.get('/profile', checkAuth, (req, res) => {
+      res.status(200).json({
+        message:req.userData,
+      });
 
-    try{
-        const token = req.headers.authorization.split(' ')[0];
-        const decoded = jwt.verify(token, process.env.jwt_key, (err, verified)=>{
-            if(err){
-                res.status(500).json({
-                    message:err.message,
-                });
-            } else{
-                res.status(200).json({
-                    verified:verified,
-                });
-            }
-        });
-        User.find()
-            .exec()
-            .then(result => {
-                res.status(200).json({
-                    message: 'Verified',
-                    decoded: decoded, 
-                    result:result
-            })
-        })
-
-    }
-    catch(error){
-        res.status(401).json({
-            message:error.message,
-        });
-    }
-    
-});
+    }  
+);
 
 module.exports = routes;
