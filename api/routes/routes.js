@@ -72,7 +72,10 @@ routes.post('/login', (req, res) => {
                             });
                         }
                         if(result){
-                            jwt.sign({email:req.body.email, id:req.body.id}, process.env.jwt_key);
+                            const token = jwt.sign({ 
+                                email:result.email,
+                                password:result.password,
+                            })
                             res.status(200).json({
                                 message: "Authorization Successful",
                                 result: result,
@@ -99,8 +102,18 @@ routes.post('/login', (req, res) => {
 routes.get('/profile', (req, res, next) => {
 
     try{
-        const token = req.headers.authorization.split(' ')[1];
-        const decoded = jwt.verify(token, process.env.jwt_key);
+        const token = req.headers.authorization.split(' ')[0];
+        const decoded = jwt.verify(token, process.env.jwt_key, (err, verified)=>{
+            if(err){
+                res.status(500).json({
+                    message:err.message,
+                });
+            } else{
+                res.status(200).json({
+                    verified:verified,
+                });
+            }
+        });
         User.find()
             .exec()
             .then(result => {
@@ -114,7 +127,7 @@ routes.get('/profile', (req, res, next) => {
     }
     catch(error){
         res.status(401).json({
-            message:'Authorization failed',
+            message:error.message,
         });
     }
     
