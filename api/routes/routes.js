@@ -33,7 +33,7 @@ findUser(req.body.email)
                     state:req.body.state,
                     zip:req.body.zip,
                     email:req.body.email,
-                    password:hash,
+                    password:req.body.password,
                 });
                 saveUser(newUser)
                 .then(result => {
@@ -79,16 +79,14 @@ routes.post('/login', (req, res) => {
                         }
                         if(result){
                             const token = jwt.sign({
-                                firstName: firstName,
-                                lastName: lastName, 
                                 email:email,
                                 password:password,
                             }, process.env.jwt)
                             res.status(200).json({
                                 message: "Authorization Successful",
                                 result: result,
-                                firstName: firstName,
-                                lastName: lastName,
+                                // firstName: firstName,
+                                // lastName: lastName,
                                 token:token
                             });
                         }
