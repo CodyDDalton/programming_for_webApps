@@ -33,12 +33,22 @@ findUser(req.body.email)
                     state:req.body.state,
                     zip:req.body.zip,
                     email:req.body.email,
-                    password:req.body.password,
+                    password:hash
                 });
                 saveUser(newUser)
                 .then(result => {
                     res.status(200).json({
-                        user: result
+                        user: {
+                            _id:result._id,
+                            firstName:result.firstName,
+                            lastName:result.lastName,
+                            address:result.address,
+                            city:result.city,
+                            state:result.state,
+                            zip:result.zip,
+                            email:result.email,
+                            password:req.body.password
+                        }
                     });
                     console.log(result);
                 })
@@ -61,6 +71,9 @@ routes.post('/login', (req, res) => {
 
     findUser(req.body.email)
             .then(result => {
+                const password = result[0].password;
+                console.log(password);
+                console.log(req.body.password);
                 if(result.length >! 0){
                     res.status(500).json({
                         message:'We could not find an account belonging to email: '+req.body.email,
@@ -68,10 +81,10 @@ routes.post('/login', (req, res) => {
                 }
                 else {
                     const firstName = result[0].firstName;
+                    
                     const lastName = result[0].lastName;
                     const email = result[0].email;
-                    const password = result[0].password;
-                    bcrypt.compare(req.body.password, result[0].password, (err, result)=>{
+                    bcrypt.compare(password, req.body.password, (err, result)=>{
                         if(err){
                             return res.status(501).json({
                                 message:err.message
@@ -85,8 +98,8 @@ routes.post('/login', (req, res) => {
                             res.status(200).json({
                                 message: "Authorization Successful",
                                 result: result,
-                                // firstName: firstName,
-                                // lastName: lastName,
+                                firstName: firstName,
+                                lastName: lastName,
                                 token:token
                             });
                         }
