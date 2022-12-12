@@ -71,9 +71,12 @@ routes.post('/login', (req, res) => {
 
     findUser(req.body.email)
             .then(result => {
-                const user = result[0].user;
-                const password = result[0].user.password;
-                console.log(user.password);
+                const password = result[0].password;
+                const firstName = result[0].firstName;
+                    
+                    const lastName = result[0].lastName;
+                    const email = result[0].email;
+                console.log(password);
                 console.log(req.body.password);
                 if(result.length >! 0){
                     res.status(500).json({
@@ -82,11 +85,8 @@ routes.post('/login', (req, res) => {
                 }
                 else {
                     
-                    bcrypt.compare(user.password, password, (err, result)=>{
-                        const firstName = result[0].firstName;
-                    
-                    const lastName = result[0].lastName;
-                    const email = result[0].email;
+                    bcrypt.compare(req.body.password, password, (err, result)=>{
+                        
                         if(err){
                             return res.status(501).json({
                                 message:err.message
@@ -103,6 +103,8 @@ routes.post('/login', (req, res) => {
                                 result: result,
                                 firstName: firstName,
                                 lastName: lastName,
+                                email:email,
+                                password:password,
                                 token:token
                             });
                         }
