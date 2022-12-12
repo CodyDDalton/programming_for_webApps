@@ -78,7 +78,9 @@ routes.post('/login', (req, res) => {
                             });
                         }
                         if(result){
-                            const token = jwt.sign({ 
+                            const token = jwt.sign({
+                                firstName: firstName,
+                                lastName: lastName, 
                                 email:email,
                                 password:password,
                             }, process.env.jwt)
