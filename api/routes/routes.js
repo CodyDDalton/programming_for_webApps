@@ -73,9 +73,12 @@ routes.post('/login', (req, res) => {
             .then(result => {
                 const password = result[0].password;
                 const firstName = result[0].firstName;
-                    
-                    const lastName = result[0].lastName;
-                    const email = result[0].email;
+                const lastName = result[0].lastName;
+                const address = result[0].address;
+                const zip = result[0].zip;
+                const city = result[0].city;
+                const state = result[0].state;
+                const email = result[0].email;
                 console.log(password);
                 console.log(req.body.password);
                 if(result.length >! 0){
@@ -103,6 +106,10 @@ routes.post('/login', (req, res) => {
                                 result: result,
                                 firstName: firstName,
                                 lastName: lastName,
+                                address:address,
+                                city:city,
+                                state:state,
+                                zip:zip,
                                 email:email,
                                 password:password,
                                 token:token
