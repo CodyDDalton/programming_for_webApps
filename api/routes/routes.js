@@ -80,8 +80,6 @@ routes.post('/login', (req, res) => {
                 const city = result[0].city;
                 const state = result[0].state;
                 const email = result[0].email;
-                console.log(password);
-                console.log(req.body.password);
                 if(result.length >! 0){
                     res.status(500).json({
                         message:'We could not find an account belonging to email: '+req.body.email,
@@ -98,6 +96,7 @@ routes.post('/login', (req, res) => {
                         if(result){
                             
                             const token = jwt.sign({
+                                firstName:firstName,
                                 email:email,
                                 password:password,
                             }, process.env.jwt)
