@@ -38,6 +38,7 @@ findUser(req.body.email)
                 saveUser(newUser)
                 .then(result => {
                     res.status(200).json({
+                        message: 'User created',
                         user: {
                             _id:result._id,
                             firstName:result.firstName,
@@ -87,7 +88,6 @@ routes.post('/login', (req, res) => {
                     });
                 }
                 else {
-                    
                     bcrypt.compare(req.body.password, password, (err, result)=>{
                         
                         if(err){
